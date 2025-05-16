@@ -6,6 +6,10 @@ from classify import classify
 
 app = FastAPI()
 
+@app.get("/")
+def root():
+    return {"message": "API is live. Use POST /classify/ to classify log messages."}
+
 @app.post("/classify/")
 async def classify_logs(file: UploadFile):
     if not file.filename.endswith('.csv'):
