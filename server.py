@@ -1,7 +1,7 @@
 import pandas as pd
 from fastapi import FastAPI, UploadFile, HTTPException
 from fastapi.responses import FileResponse
-
+import os
 from classify import classify
 
 app = FastAPI()
@@ -26,15 +26,16 @@ async def classify_logs(file: UploadFile):
 
         print("Dataframe:",df.to_dict())
 
-        # Save the modified file
-        output_file = "resources/output.csv"
+        # Ensure directory exists
+        output_dir = "resources"
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        output_file = os.path.join(output_dir, "output.csv")
         df.to_csv(output_file, index=False)
-        print("File saved to output.csv")
+
         return FileResponse(output_file, media_type='text/csv')
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         file.file.close()
-        # # Clean up if the file was saved
-        # if os.path.exists("output.csv"):
-        #     os.remove("output.csv")
